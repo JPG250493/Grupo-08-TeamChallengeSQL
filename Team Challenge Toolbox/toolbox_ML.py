@@ -6,7 +6,12 @@ import seaborn as sns
 
 def describe_df(df: pd.DataFrame):
     """
-    Genera un resumen estadístico detallado del DataFrame.
+     Devuelve un resumen completo del DataFrame incluyendo:
+    - Tipo de dato
+    - Número de nulos
+    - Porcentaje de nulos
+    - Número de valores únicos
+    - Estadísticas descriptivas (si es numérica)
     """
     summary = pd.DataFrame({
         'dtype': df.dtypes,
@@ -18,6 +23,19 @@ def describe_df(df: pd.DataFrame):
 
 
 def get_features_num_regression(df, target_col, corr_threshold=0.1):
+    """
+     Devuelve una lista de variables numéricas cuya correlación con el target
+    es mayor en valor absoluto que umbral_corr.
+
+    Argumentos:
+    df (pd.DataFrame): DataFrame de entrada.
+    target_col (str): Nombre de la variable objetivo numérica.
+    umbral_corr (float): Umbral mínimo de correlación (0-1).
+    pvalue (float, optional): Nivel de significación estadística.
+
+    Retorna:
+    list: Lista de columnas numéricas que cumplen los criterios.
+    """
     num_cols = df.select_dtypes(include="number").columns.tolist()
 
     if target_col not in num_cols:
@@ -36,7 +54,19 @@ def get_features_num_regression(df, target_col, corr_threshold=0.1):
 
 def tipifica_variables(df: pd.DataFrame, umbral_categoria: int, umbral_continua: float):
     """
-    Sugiere el tipo de variable según su cardinalidad.
+     Clasifica las variables del DataFrame en:
+    - numerica_continua
+    - numerica_discreta
+    - categorica
+    - binaria
+
+    Args:
+        df (pd.DataFrame)
+        umbral_categoria (int): número máximo de valores únicos
+                                 para considerar una variable numérica como discreta
+
+    Returns:
+        pd.DataFrame con el tipo asignado
     """
     resultados = []
 
@@ -64,7 +94,12 @@ def tipifica_variables(df: pd.DataFrame, umbral_categoria: int, umbral_continua:
 
 def plot_features_num_regression(df, features, target_col):
     """
-    Genera scatter plots entre cada variable numérica y la variable objetivo.
+     Genera pairplots entre target y variables numéricas
+    que cumplan el umbral de correlación y significación.
+
+    Retorna:
+    list: columnas que cumplen condiciones.
+    
     """
     for col in features:
         plt.figure()
@@ -77,7 +112,17 @@ def plot_features_num_regression(df, features, target_col):
 
 def get_features_cat_regression(df, target_col, cardinality_threshold=0.1):
     """
-    Devuelve columnas categóricas significativas.
+   Devuelve variables categóricas cuya relación con target
+    sea estadísticamente significativa.
+
+    Argumentos:
+    df (pd.DataFrame)
+    target_col (str)
+    pvalue (float)
+
+    Retorna:
+    list: columnas categóricas que cumplen condiciones.
+    
     """
     cat_cols = df.select_dtypes(include=["object", "category"]).columns
     selected_features = []
